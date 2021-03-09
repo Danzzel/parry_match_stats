@@ -1,58 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parry_match_stats/cubit/cubit_state.dart';
-
+import 'package:parry_match_stats/resources/pm_list_repository.dart';
+import 'package:parry_match_stats/widgets/all_disciplins.dart';
 import 'package:parry_match_stats/cubit/pm_list_cubit.dart';
 
-class HomaPage extends StatelessWidget {
+class HomePage extends StatelessWidget {
+  final docRepository = PMListRepository();
   @override
   Widget build(BuildContext context) {
-    final DisCubit disCubit = context.read<DisCubit>();
-    disCubit.fetchDisciplines();
-    return BlocBuilder<DisCubit, PMListState>(
-      builder: (context, state) {
-        if (state is PMListEmptyState) {
-          return Center(
-            child: Text('No Data'),
-          );
-        }
-        if (state is PMListLoadingState) {
-          return CircularProgressIndicator();
-        }
-        if (state is PMListLoadedState) {
-          return ListView.builder(
-            itemCount: state.loadedDisciplines.data.length,
-            itemBuilder: (context, index) =>
-            //  Container(
-            //   color: Colors.black87,
-            //   child: 
-              Container(
-                width: 300,
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black)
-                ),
-                child: FlatButton(
-                  onPressed: (){
-                    print(state.loadedDisciplines.data[index].iId);
-                  },
-                  
-                  child: Text('${state.loadedDisciplines.data[index].name}', style: TextStyle(color: Colors.black87), ),
-                ),
-              ),
-            // ),
-          );
-        }
-         if (state is PMListErrorState) {
-          return Center(
-            child: Text(
-              'Error fetching data',
-              style: TextStyle(fontSize: 20),
-            ),
-          );
-        }
-        return Center(child: CircularProgressIndicator());
-      },
-    );
+    return MaterialApp(
+        home: BlocProvider<DisCubit>(
+      create: (context) => DisCubit(docRepository),
+      child: Scaffold(
+        appBar: AppBar(title: Text('PM Stats')),
+        body: Container(
+          child: AllDisciplins(),
+        ),
+      ),
+    ));
   }
+
+  // void funkt() {
+  //   doc.getDisciplin().then((value) => print(value.data[5].name));
+  //   // doc.then((value) => print(value.data[0].name));
+  // }
 }
